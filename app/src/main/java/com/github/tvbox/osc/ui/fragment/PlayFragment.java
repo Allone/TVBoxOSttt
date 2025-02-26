@@ -234,7 +234,15 @@ public class PlayFragment extends BaseLazyFragment {
             @Override
             public void replay(boolean replay) {
                 autoRetryCount = 0;
-                play(replay);
+                if(replay){
+                    play(true);
+                }else {
+                    if(webPlayUrl!=null && !webPlayUrl.isEmpty()) {
+                        playUrl(webPlayUrl,webHeaderMap);
+                    }else {
+                        play(false);
+                    }
+                }
             }
 
             @Override
@@ -883,10 +891,16 @@ public class PlayFragment extends BaseLazyFragment {
             autoRetryFromLoadFoundVideoUrls();
             return true;
         }
-        if (autoRetryCount < 1) {
+        if (autoRetryCount < 2) {
+            if(autoRetryCount==1){
+                //第二次重试时重新调用接口
+                play(false);
+            }else {
+                //第一次重试直接带着原地址继续播放
+                play(false);
+//                playUrl(webPlayUrl, webHeaderMap);
+            }
             autoRetryCount++;
-//            play(false);
-            playUrl(webPlayUrl, webHeaderMap);
             return true;
         } else {
             autoRetryCount = 0;

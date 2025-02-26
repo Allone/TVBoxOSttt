@@ -214,8 +214,17 @@ public class PlayActivity extends BaseActivity {
 
             @Override
             public void replay(boolean replay) {
+                LOG.i("echo-replay");
                 autoRetryCount = 0;
-                play(replay);
+                if(replay){
+                    play(true);
+                }else {
+                    if(webPlayUrl!=null && !webPlayUrl.isEmpty()) {
+                        playUrl(webPlayUrl,webHeaderMap);
+                    }else {
+                        play(false);
+                    }
+                }
             }
 
             @Override
@@ -505,6 +514,7 @@ public class PlayActivity extends BaseActivity {
             try {
                 String url_encode;
                 url_encode=URLEncoder.encode(url,"UTF-8");
+                LOG.i("echo-BOM-------");
                 url = ControlManager.get().getAddress(true) + "proxy?go=bom&url="+ url_encode;
             }catch (UnsupportedEncodingException e) {
 
@@ -850,9 +860,16 @@ public class PlayActivity extends BaseActivity {
         }
 
         if (autoRetryCount < 2) {
+            if(autoRetryCount==1){
+                //第二次重试时重新调用接口
+                play(false);
+            }else {
+                //第一次重试直接带着原地址继续播放
+                play(false);
+//                playUrl(webPlayUrl, webHeaderMap);
+            }
             autoRetryCount++;
 //            play(false);
-            playUrl(webPlayUrl, webHeaderMap);
             return true;
         } else {
             autoRetryCount = 0;
